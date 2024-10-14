@@ -1,7 +1,10 @@
+using System.Diagnostics;
 using IdentityServer;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +29,10 @@ builder.Services.AddOpenIddict()
 
         options.RegisterScopes(Scopes.Email, Scopes.Profile, Scopes.Roles);
 
-        options.AllowAuthorizationCodeFlow();
+        options
+            .AllowAuthorizationCodeFlow()
+            .AllowRefreshTokenFlow();
+        // .RequireProofKeyForCodeExchange();
 
         options.AddEncryptionKey(new SymmetricSecurityKey(Convert.FromBase64String("DRjd/GnduI3Efzen9V9BvbNUfc/VKgXltV7Kbk9sMkY=")));
 
@@ -48,8 +54,10 @@ builder.Services.AddTransient<Seeder>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.WebHost.UseUrls(["http://localhost:8080"]);
+// builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("."));
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(c => {
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(c =>
+{
     c.LoginPath = "/Authenticate";
     c.Cookie.Name = "Brownie";
     c.SlidingExpiration = true;
@@ -65,6 +73,12 @@ await using (var scope = app.Services.CreateAsyncScope())
     await seeder.AddClients();
     await seeder.AddScopes();
     await seeder.AddOidcDebuggerClient();
+
+    var tokenManager = scope.ServiceProvider.GetRequiredService<IOpenIddictTokenManager>();
+    var authorizationManager = scope.ServiceProvider.GetRequiredService<IOpenIddictAuthorizationManager>();
+
+    await tokenManager.PruneAsync(DateTime.UtcNow);
+    await authorizationManager.PruneAsync(DateTime.UtcNow);
 }
 
 if (app.Environment.IsDevelopment())
