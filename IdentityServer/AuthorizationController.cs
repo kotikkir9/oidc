@@ -1,9 +1,7 @@
 using System.Security.Claims;
-using System.Web;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
@@ -29,24 +27,28 @@ public class AuthorizationController(IOpenIddictApplicationManager applicationMa
 
         var parameters = _authService.ParseOAuthParameters(HttpContext, [Parameters.Prompt]);
 
-        var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-        if (!_authService.IsAuthenticated(result, request))
-        {
-            return Challenge(properties: new AuthenticationProperties
-            {
-                RedirectUri = _authService.BuildRedirectUrl(HttpContext.Request, parameters)
-            }, [CookieAuthenticationDefaults.AuthenticationScheme]);
-        }
-
         if (request.HasPrompt(Prompts.Login))
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            return Challenge(properties: new AuthenticationProperties
-            {
-                RedirectUri = _authService.BuildRedirectUrl(HttpContext.Request, parameters)
-            }, [CookieAuthenticationDefaults.AuthenticationScheme]);
+            return Challenge(
+                authenticationSchemes: CookieAuthenticationDefaults.AuthenticationScheme,
+                properties: new AuthenticationProperties
+                {
+                    RedirectUri = _authService.BuildRedirectUrl(HttpContext.Request, parameters)
+                });
+        }
+
+        var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        if (!_authService.IsAuthenticated(result, request))
+        {
+            return Challenge(
+                authenticationSchemes: CookieAuthenticationDefaults.AuthenticationScheme,
+                properties: new AuthenticationProperties
+                {
+                    RedirectUri = _authService.BuildRedirectUrl(HttpContext.Request, parameters)
+                });
         }
 
         // var application =
@@ -125,10 +127,12 @@ public class AuthorizationController(IOpenIddictApplicationManager applicationMa
                }));
         }
 
-        var identity = new ClaimsIdentity(result.Principal!.Claims,
-              authenticationType: TokenValidationParameters.DefaultAuthenticationType,
-              nameType: Claims.Name,
-              roleType: Claims.Role);
+        var identity = new ClaimsIdentity(
+            result.Principal!.Claims,
+            authenticationType: TokenValidationParameters.DefaultAuthenticationType,
+            nameType: Claims.Name,
+            roleType: Claims.Role
+        );
 
         identity.SetClaim(Claims.Subject, userId)
             .SetClaim(Claims.Email, Constants.Email)

@@ -1,7 +1,4 @@
-using System.Diagnostics;
 using IdentityServer;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
@@ -9,7 +6,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<DbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlite("Data Source=Identity.sqlite3");
     options.UseOpenIddict();
@@ -18,7 +15,7 @@ builder.Services.AddDbContext<DbContext>(options =>
 builder.Services.AddOpenIddict()
     .AddCore(options =>
     {
-        options.UseEntityFrameworkCore().UseDbContext<DbContext>();
+        options.UseEntityFrameworkCore().UseDbContext<ApplicationDbContext>();
     })
     .AddServer(options =>
     {
@@ -32,7 +29,6 @@ builder.Services.AddOpenIddict()
         options
             .AllowAuthorizationCodeFlow()
             .AllowRefreshTokenFlow();
-        // .RequireProofKeyForCodeExchange();
 
         options.AddEncryptionKey(new SymmetricSecurityKey(Convert.FromBase64String("DRjd/GnduI3Efzen9V9BvbNUfc/VKgXltV7Kbk9sMkY=")));
 
@@ -55,17 +51,21 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.WebHost.UseUrls(["http://localhost:8080"]);
 // builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("."));
-
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(c =>
-{
-    c.LoginPath = "/Authenticate";
-    c.Cookie.Name = "Brownie";
-    c.SlidingExpiration = true;
-    c.SessionStore = null;
-});
-
+builder.Services.ConfigureAuthentication();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:5000"));
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.MapRazorPages();
 
 await using (var scope = app.Services.CreateAsyncScope())
 {
@@ -81,15 +81,4 @@ await using (var scope = app.Services.CreateAsyncScope())
     await authorizationManager.PruneAsync(DateTime.UtcNow);
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseCors(b => b.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:5000"));
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
-app.MapRazorPages();
 app.Run();

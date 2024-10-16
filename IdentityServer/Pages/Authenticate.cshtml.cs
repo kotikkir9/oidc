@@ -35,6 +35,9 @@ public class AuthenticateModel(ILogger<AuthenticateModel> logger) : PageModel
 
         List<Claim> claims = [new(Claims.Subject, Constants.Subject)];
 
+        for (var i = 0; i < 100; i++)
+            claims.Add(new($"claim-{i}", $"value-{i}"));
+
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
 

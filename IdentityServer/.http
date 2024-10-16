@@ -1,5 +1,5 @@
 @host=http://localhost:8080
-@cookie=Brownie=CfDJ8MNpswaHXXVEpi_IpR1EnMP2sCCf24c3tbVCxU7XETF4iQhjdXnE8TlimY05Rc4nAPgOnFJTgdSRbdrNLT24SLptRkpkJhuEkxHQEtEt6QR1Rn2qGX6EflUbazejgskB8-793-mdvPBe7bROnqRmCsXWTRKQ_YfRveu-O5Nxw4REhHurGIfZAY584sCV_ShDaiDhuThUob8ZbXNx_1ReEL2rB4p6nuALTT7i-uuLrB5b4_RybSmkWXa96G_TlH32d94idoM2lunowZGoc-8eV_tl1O-mX47xqOWA5V8OdIqU; path=/; samesite=lax; httponly
+@cookie=DreamTheater=CfDJ8MNpswaHXXVEpi_IpR1EnMNe5dmxhLyFh-AcSio-5RPL9W1Tzp2psjNoW00A9if5duo_xD8HjusETJLLn3h4zsdkagcbhyJGXwCk41s60tC9bDX7v6Hy78HL3G4TCxPZmGD0D9zB8pSFEPDwjnSlEPhVPSMT6QJEgMGnX4_ROYNB87aVBlnNvhFHaIAMOmGUtGJHt-SMHikUoKGBNOIvv4BtyByiehZm-mTvJ1MG1JRdhSzFZlQnOpcUktMv1VP25b88tH-tRn-g6EnBtqXpPu7sSCInt9Q4hx7T8TYsWUjE; path=/; samesite=lax; httponly
 
 #################################################################################
 ### Authorize
@@ -27,7 +27,8 @@ Content-Type: application/x-www-form-urlencoded
 
 &email=kirill@email.com
 &password=password
-&__RequestVerificationToken=CfDJ8MNpswaHXXVEpi_IpR1EnMNDjGYRF4OgI1Z6Ho18TkuvePf-Q-5gf72mOgDO2jmyUyJpJQNOeM-6THSMbclRAtECo87yvEWlrOfCWPfBbcXpzVGPdbqNpBMdIjuhgOr5eh22X4WdE5jChdccjAYAOSo
+&__RequestVerificationToken=CfDJ8MNpswaHXXVEpi_IpR1EnMMAEpmAnLi0qu08vvTyC9OLeFG81M8njAUEQu3asl3AmXtxaPx37zXBWVovsO9K0sDnpJU4g6dsqY0xoh9A_Mn8SIJ5gzwv4gjRdJWLmCaCL8GHXq3pIfqQRQHt1VsOa-Y
+
 
 #################################################################################
 ### Token
@@ -36,7 +37,7 @@ Content-Type: application/x-www-form-urlencoded
 POST {{host}}/connect/token
 Content-Type: application/x-www-form-urlencoded
 
-&code=EEHmFFRBWyMaOTi87rYT128zILaC19uIrJQ8hhj4u0Y
+&code=kmjN_HU_lfAgTurReZso7oGLhcZyY5PbQaMaQ2bgqbM
 &grant_type=authorization_code
 &client_id=oidc-debugger
 &client_secret=901564A5-E7FE-42CB-B10D-61EF6A8F3654

@@ -32,7 +32,7 @@ public class Seeder(IServiceProvider serviceProvider)
     public async Task AddClients()
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-        var context = scope.ServiceProvider.GetRequiredService<DbContext>();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         await context.Database.EnsureCreatedAsync();
 
@@ -80,7 +80,7 @@ public class Seeder(IServiceProvider serviceProvider)
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
 
-        var context = scope.ServiceProvider.GetRequiredService<DbContext>();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         await context.Database.EnsureCreatedAsync();
 
         var manager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
